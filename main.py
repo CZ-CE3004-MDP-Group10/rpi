@@ -16,8 +16,12 @@ class Main:
     #     )
     def connect(self):
         self.arduino.connect(),
-        self.android.connect(),
+        # self.android.connect(),
+    
+    def 
 
 if __name__ == "__main__":
     main = Main()
+    main.connect()
+    
     # asyncio.run(main.connect())

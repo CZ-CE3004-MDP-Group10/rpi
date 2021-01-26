@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "SSH FS - mdp-rpi",
+			"uri": "ssh://mdp-rpi/"
+		}
+	],
+	"settings": {
+		"sshfs.configs": [
+			{
+				"name": "mdp-rpi",
+				"host": "192.168.10.1",
+				"username": "pi",
+				"password": "raspberry"
+			}
+		]
+	}
+}
