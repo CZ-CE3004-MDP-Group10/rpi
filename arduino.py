@@ -4,14 +4,13 @@ import time
 
 class Arduino:
     def __init__(self):
-        self.serial = None 
+        self.serial = serial.Serial() 
         self.serial.port = "/dev/ttyACM0"
         self.serial.baudrate = 115200
         self.serial.write_timeout = 0
         self.status = 0
         print("Arduino object instantiated")
     def connect(self):
-        self.serial = serial.Serial() 
         while(self.status == 0):
             try:
                 self.serial.open()
@@ -31,19 +30,38 @@ class Arduino:
 
     def read(self):
         try:
-            message = self.serial.readline().strip()
-            print("from arduino: {message}")
+            message = self.serial.readline()
+            print("from arduino:", message)
             if len(message) > 0 :
                 return message
         except Exception as e:
             print(e)
         return None
 
-    def write(self, message):
+    def write(self):
         try:
-            self.serial.write(message)
-            print("to arduino: {message}")
+            self.w = "w"
+            self.serial.write(self.w.encode())
+            # print("to arduino: {message}")
         except Exception as e:
             print(e)
+
+
+    # async def read(self):
+    #     try:
+    #         message = self.serial.readline().strip()
+    #         print("from arduino: {message}")
+    #         if len(message) > 0 :
+    #             return message
+    #     except Exception as e:
+    #         print(e)
+    #     return None
+
+    # async def write(self, message):
+    #     try:
+    #         self.serial.write(message)
+    #         print("to arduino: {message}")
+    #     except Exception as e:
+    #         print(e)
 
                     
