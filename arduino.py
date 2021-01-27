@@ -2,20 +2,22 @@ import asyncio
 import serial
 import time
 
+from configs import ArduinoConfigs
+
 class Arduino:
     def __init__(self):
         self.serial = serial.Serial() 
-        self.serial.port = "/dev/ttyACM0"
-        self.serial.baudrate = 115200
-        self.serial.write_timeout = 0
-        self.status = 0
+        self.serial.port = ArduinoConfigs.SERIAL_PORT
+        self.serial.baudrate = ArduinoConfigs.BAUD_RATE
+        self.serial.write_timeout = ArduinoConfigs.WRITE_TIMEOUT
+        self.connected = False
         print("Arduino object instantiated")
     def connect(self):
-        while(self.status == 0):
+        while self.connected == False:
             try:
                 self.serial.open()
+                self.connected = True
                 print("Arduino USB connection established")
-                self.status = 1
             except Exception as e:
                 print(e)
                 time.sleep(1)
@@ -24,44 +26,25 @@ class Arduino:
         try:
             if self.serial is not None:
                 self.serial.close()
-                self.serial = None
+                self.connected = False
         except Exception as e:
             print(e)
 
     def read(self):
         try:
             message = self.serial.readline()
-            print("from arduino:", message)
+            print(f"From arduino:{message}")
             if len(message) > 0 :
                 return message
         except Exception as e:
             print(e)
         return None
 
-    def write(self):
+    def write(self, message):
         try:
-            self.w = "w"
-            self.serial.write(self.w.encode())
-            # print("to arduino: {message}")
+            print(f"To arduino:{message}")
+            self.serial.write(message.encode('utf-8'))
         except Exception as e:
             print(e)
-
-
-    # async def read(self):
-    #     try:
-    #         message = self.serial.readline().strip()
-    #         print("from arduino: {message}")
-    #         if len(message) > 0 :
-    #             return message
-    #     except Exception as e:
-    #         print(e)
-    #     return None
-
-    # async def write(self, message):
-    #     try:
-    #         self.serial.write(message)
-    #         print("to arduino: {message}")
-    #     except Exception as e:
-    #         print(e)
 
                     
