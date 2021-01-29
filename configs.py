@@ -4,6 +4,6 @@ class ArduinoConfigs:
     WRITE_TIMEOUT = 0
 
 class AlgorithmConfigs:
-    SERVER_IP = '192.168.1.10'
-    SERVER_PORT = 80
+    SERVER_IP = '192.168.10.1'
+    SERVER_PORT = 101
     BUFFER_SIZE = 1024

@@ -13,14 +13,14 @@ class Algorithm:
 
         self.client_sock = None
         self.client_ip = None
-
+        self.connected = False
     def connect(self):
         while True:
             try:
                 print('Establishing connection with Algorithm')
                 if self.client_sock is None:
                     self.client_sock, self.address = self.server_sock.accept()
-                    print('{self.address} has connected')
+                    print(f'{self.address} has connected')
                     break
             except Exception as e:
                 print(f"Connection with Algorithm failed:{e}")
@@ -44,7 +44,6 @@ class Algorithm:
             if len(message) > 0:
                 print(f"From Algorithm:{message}")
                 return message
-            return None
         except Exception as e:
             print(f"Algorithm:{e}")
 

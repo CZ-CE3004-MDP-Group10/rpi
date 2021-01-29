@@ -32,7 +32,7 @@ class Arduino:
 
     def read(self):
         try:
-            message = self.serial.readline()
+            message = self.serial.readline().strip()
             print(f"From arduino:{message}")
             if len(message) > 0 :
                 return message
@@ -43,7 +43,7 @@ class Arduino:
     def write(self, message):
         try:
             print(f"To arduino:{message}")
-            self.serial.write(message.encode('utf-8'))
+            self.serial.write(message)
         except Exception as e:
             print(e)
 

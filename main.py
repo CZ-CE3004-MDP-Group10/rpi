@@ -1,6 +1,7 @@
 import asyncio
 import time
 from multiprocessing import Process, Value, Queue, Manager
+from typing import MutableMapping
 
 from arduino import Arduino
 # from android import Android
@@ -13,13 +14,16 @@ class Main:
         # self.android = Android()
         # instantiate computer vision module
 
-        self.manager = Manager()
-        self.write_queue = self.manager.Queue()
+        self.write_queue = Manager().Queue()
 
         self.read_arduino_process = Process(target=self.read_arduino)
+        # self.read_algorithm_process = Process(target=self.read_algorithm, args=(self.write_queue,))
         self.read_algorithm_process = Process(target=self.read_algorithm)
+
         # self.read_android_process = Process(target=self.read_android)
-        self.write_target = Process(target=self.write_target)
+        # self.write_target = Process(target=self.write_target, args=(self.write_queue,))
+        # self.write_target = Process(target=self.write_target)
+
 
     def start(self):
         try:
@@ -28,34 +32,38 @@ class Main:
             # self.android.connect()
             
             self.read_arduino_process.start()
-            # self.read_android_process.start()
+            self.read_algorithm_process.start()
             # self.write_android_process.start()
 
-            self.write_target.start()
+            # self.write_target.start()
+
         except Exception as e:
             print(e)
 
     def read_arduino(self):
+        print("read_aruino process started")
         while True:
             try:
                 raw_message = self.arduino.read()
                 if raw_message is None:
                     continue
-                # for message in raw_message.splitlines():
-                #     if len(message) <= 0:
-                #         continue
-                self.write_queue.put_nowait(raw_message)
+                for message in raw_message.splitlines():
+                    if len(message) <= 0:
+                        continue
             except Exception as e:
-                print(f"read_arduino:{e}")
+                print(f"read_arduino:{str(e)}")
                 break    
 
     def read_algorithm(self):
         while True:
+            raw_message = None
             try:
                 raw_message = self.algorithm.read()
                 if raw_message is None:
-                    continue                
+                    continue
+                print(raw_message)
                 self.write_queue.put_nowait(raw_message)
+                # self.algorithm.write(raw_message)
                 
             except Exception as e  :
                 print(f'read_algorithm:{e}')
@@ -66,12 +74,13 @@ class Main:
             try:
                 if not self.write_queue.empty():
                     message = self.write_queue.get_nowait()
-                    print(message)
+                    print(f"write target:{str(message)}")
                     self.arduino.write(message)
                     # self.algorithm.write(message)
                     # self.android.write(message)
             except Exception as e:
                 print(f"write_target:{e}")
+                break
 
 
 
@@ -79,7 +88,8 @@ class Main:
 if __name__ == "__main__":
     main = Main()
     main.start()
-    main.readArduino()
+    main.write_target()
+    # main.readArduino()
 
 
 
@@ -106,3 +116,9 @@ if __name__ == "__main__":
     # asyncio.run(main.connect())
     # _thread.start_new_thread(main.writeArduino)
     # _thread.start_new_thread(main.readArduino)
+
+    
+            # await asyncio.gather(
+            #     self.arduino.connect(),
+            #     self.algorithm.connect(),
+            # )
