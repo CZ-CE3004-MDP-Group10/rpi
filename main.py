@@ -17,11 +17,9 @@ class Main:
         self.write_queue = Manager().Queue()
 
         self.read_arduino_process = Process(target=self.read_arduino)
-        # self.read_algorithm_process = Process(target=self.read_algorithm, args=(self.write_queue,))
         self.read_algorithm_process = Process(target=self.read_algorithm)
-
         # self.read_android_process = Process(target=self.read_android)
-        # self.write_target = Process(target=self.write_target, args=(self.write_queue,))
+        
         # self.write_target = Process(target=self.write_target)
 
 
@@ -63,7 +61,6 @@ class Main:
                     continue
                 print(raw_message)
                 self.write_queue.put_nowait(raw_message)
-                # self.algorithm.write(raw_message)
                 
             except Exception as e  :
                 print(f'read_algorithm:{e}')

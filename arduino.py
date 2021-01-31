@@ -1,6 +1,5 @@
 import asyncio
 import serial
-import time
 
 from configs import ArduinoConfigs
 
@@ -12,6 +11,7 @@ class Arduino:
         self.serial.write_timeout = ArduinoConfigs.WRITE_TIMEOUT
         self.connected = False
         print("Arduino object instantiated")
+
     def connect(self):
         while self.connected == False:
             try:
@@ -20,7 +20,6 @@ class Arduino:
                 print("Arduino USB connection established")
             except Exception as e:
                 print(e)
-                time.sleep(1)
 
     def disconnect(self):
         try:
