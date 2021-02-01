@@ -4,21 +4,21 @@ from multiprocessing import Process, Value, Queue, Manager
 from typing import MutableMapping
 
 from arduino import Arduino
-# from android import Android
+from android import Android
 from algorithm import Algorithm
 
 class Main:
     def __init__(self):
         self.arduino = Arduino()
         self.algorithm = Algorithm()
-        # self.android = Android()
+        self.android = Android()
         # instantiate computer vision module
 
         self.write_queue = Manager().Queue()
 
         self.read_arduino_process = Process(target=self.read_arduino)
         self.read_algorithm_process = Process(target=self.read_algorithm)
-        # self.read_android_process = Process(target=self.read_android)
+        self.read_android_process = Process(target=self.read_android)
         
         # self.write_target = Process(target=self.write_target)
 
@@ -27,11 +27,11 @@ class Main:
         try:
             self.arduino.connect()
             self.algorithm.connect()
-            # self.android.connect()
+            self.android.connect()
             
             self.read_arduino_process.start()
             self.read_algorithm_process.start()
-            # self.write_android_process.start()
+            self.write_android_process.start()
 
             # self.write_target.start()
 
@@ -64,6 +64,21 @@ class Main:
                 
             except Exception as e  :
                 print(f'read_algorithm:{e}')
+                break
+
+    def read_android(self):
+        print("read_android process started")
+        while True:
+            raw_message = None
+            try:
+                raw_message = self.android.read()
+                if raw_message is None:
+                    continue
+                print(raw_message)
+                self.write_queue.put_nowait(raw_message)
+                
+            except Exception as e  :
+                print(f'read_android:{e}')
                 break
 
     def write_target(self):

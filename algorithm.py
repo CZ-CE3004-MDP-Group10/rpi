@@ -41,11 +41,12 @@ class Algorithm:
     def read(self):
         try:
             message = self.client_sock.recv(AlgorithmConfigs.BUFFER_SIZE).strip()
+            print(f"Algorithm (MESSAGE-FROM): {message}")
             if len(message) > 0:
-                print(f"From Algorithm:{message}")
                 return message
         except Exception as e:
             print(f"Algorithm:{e}")
+        return None
 
     def write(self, message):
         try:

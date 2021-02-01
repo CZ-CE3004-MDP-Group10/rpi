@@ -10,14 +10,14 @@ class Arduino:
         self.serial.baudrate = ArduinoConfigs.BAUD_RATE
         self.serial.write_timeout = ArduinoConfigs.WRITE_TIMEOUT
         self.connected = False
-        print("Arduino object instantiated")
+        print("Arduino (INSTANTIATED)")
 
     def connect(self):
         while self.connected == False:
             try:
                 self.serial.open()
                 self.connected = True
-                print("Arduino USB connection established")
+                print("Arduino (CONNECTED) to {self.serial.port}")
             except Exception as e:
                 print(e)
 
@@ -26,13 +26,15 @@ class Arduino:
             if self.serial is not None:
                 self.serial.close()
                 self.connected = False
+                print(f"Android (DISCONNECTED)")
+            
         except Exception as e:
             print(e)
 
     def read(self):
         try:
             message = self.serial.readline().strip()
-            print(f"From arduino:{message}")
+            print(f"(FROM) arduino:{message}")
             if len(message) > 0 :
                 return message
         except Exception as e:
