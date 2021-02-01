@@ -1,6 +1,5 @@
 import asyncio
 from bluetooth import *
-import bluetooth
 from configs import AndroidConfigs
 
 class Android:
@@ -57,7 +56,7 @@ class Android:
     def write(self, message):
         try:
             print(f"Android (MESSAGE-TO): {message}")
-            self.client_sock.send(message)
+            self.client_sock.send(message.encode("utf-8"))
         except Exception as e:
             print(e)
     
