@@ -7,6 +7,4 @@ class Header:
 
 class Arduino:
     MOVING = "MOV"
-    NOT_MOVING = "DMV"
-
-    
+    NOT_MOVING = "DMV" 

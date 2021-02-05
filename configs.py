@@ -9,7 +9,7 @@ class AlgorithmConfigs:
     BUFFER_SIZE = 1024
 
 class AndroidConfigs:
+    # reset bluetooth -> hciconfig hci0 reset
     UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
-    PORT = 8
     BT_NAME = "MDP-group10"
     BUFFER_SIZE = 1024

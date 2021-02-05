@@ -3,35 +3,35 @@ import time
 from multiprocessing import Process, Value, Queue, Manager
 
 from commands import *
-from arduino import Arduino
+# from arduino import Arduino
 from algorithm import Algorithm
-# from android import Android
+from android import Android
 
 class Main:
     def __init__(self):
-        self.arduino = Arduino()
+        # self.arduino = Arduino()
         self.algorithm = Algorithm()
-        # self.android = Android()
+        self.android = Android()
         # instantiate computer vision module
 
         self.write_queue = Manager().Queue()
 
-        self.read_arduino_process = Process(target=self.read_arduino)
+        # self.read_arduino_process = Process(target=self.read_arduino)
         self.read_algorithm_process = Process(target=self.read_algorithm)
-        # self.read_android_process = Process(target=self.read_android)
+        self.read_android_process = Process(target=self.read_android)
         
         # self.write_target = Process(target=self.write_target)
 
 
     def start(self):
         try:
-            self.arduino.connect()
+            # self.arduino.connect()
             self.algorithm.connect()
-            # self.android.connect()
+            self.android.connect()
             
-            self.read_arduino_process.start()
+            # self.read_arduino_process.start()
             self.read_algorithm_process.start()
-            # self.write_android_process.start()
+            self.read_android_process.start()
 
             # self.write_target.start()
 
@@ -89,10 +89,10 @@ class Main:
                     if i[0] == Header.ARDUINO:
                         self.arduino.write(i)
                     elif i[0] == Header.ALGORITHM:
-                        # self.algorithm.write(i)
+                        self.algorithm.write(i)
                         pass
                     elif i[0] == Header.ANDROID:
-                        # self.android.write(i)
+                        self.android.write(i)
                         pass
                     else:
                         print("header info wrong")

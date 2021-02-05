@@ -17,7 +17,7 @@ class Arduino:
             try:
                 self.serial.open()
                 self.connected = True
-                print("Arduino (CONNECTED) to {self.serial.port}")
+                print(f"Arduino (CONNECTED) to {self.serial.port}")
             except Exception as e:
                 print(e)
 
