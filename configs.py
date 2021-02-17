@@ -10,6 +10,7 @@ class AlgorithmConfigs:
 
 class AndroidConfigs:
     # reset bluetooth -> hciconfig hci0 reset
+    # MAC: B8:27:EB:1A:B3:54
     UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
     BT_NAME = "MDP-group10"
     BUFFER_SIZE = 1024

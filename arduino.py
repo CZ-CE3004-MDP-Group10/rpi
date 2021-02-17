@@ -9,11 +9,16 @@ class Arduino:
         self.serial.port = ArduinoConfigs.SERIAL_PORT
         self.serial.baudrate = ArduinoConfigs.BAUD_RATE
         self.serial.write_timeout = ArduinoConfigs.WRITE_TIMEOUT
-        self.connected = False
         print("Arduino (INSTANTIATED)")
 
+    def isConnected(self):
+        try:
+            return self.serial.isOpen()
+        except:
+            return False
+
     def connect(self):
-        while self.connected == False:
+        while self.isConnected == False:
             try:
                 self.serial.open()
                 self.connected = True
@@ -22,30 +27,28 @@ class Arduino:
                 print(e)
 
     def disconnect(self):
-        try:
-            if self.serial is not None:
-                self.serial.close()
-                self.connected = False
-                print(f"Android (DISCONNECTED)")
-            
-        except Exception as e:
-            print(e)
+        self.serial.close()
+        print(f"Arduino (DISCONNECTED)")
 
     def read(self):
         try:
-            message = self.serial.readline().strip()
-            print(f"Arduino (MESSAGE-FROM):{message}")
+            message = self.serial.readline().decode("utf-8").strip()
             if len(message) > 0 :
+                print(f"Arduino (MESSAGE-FROM):{message}")
                 return message
+        except serial.SerialException:
+            self.disconnect()
         except Exception as e:
-            print(e)
+            print(f"Arduino (ERROR) read():{e}")
         return None
 
     def write(self, message):
         try:
             print(f"Arduino (MESSAGE-TO): {message}")
             self.serial.write(message.encode("utf-8"))
+        except serial.SerialException:
+            self.disconnect()
         except Exception as e:
-            print(e)
+            print(f"Arduino (ERROR) write():{e}")
 
                     
