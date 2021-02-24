@@ -22,69 +22,63 @@ class Main:
         
         # self.write_target = Process(target=self.write_target)
 
-    # def start(self):
-    #     try:
-    #         self.read_arduino_process.start()
-    #         self.read_algorithm_process.start()
-    #         self.read_android_process.start()
-
-    #     except Exception as e:
-    #         print(e)
-
     def read_arduino(self):
         while True:
             raw_message = None
-            if self.arduino.isConnected == False:
+            if self.arduino.isConnected() == False:
                 self.arduino.connect()
-            try:
-                raw_message = self.arduino.read()
-                if raw_message is None:
-                    continue
-                for message in raw_message.splitlines():
-                    if len(message) <= 0:
+            else:
+                try:
+                    raw_message = self.arduino.read()
+                    if raw_message is None:
                         continue
-            except KeyboardInterrupt:
-                print(f"Arduino (KEYBOARD INTERRUPT)")
-                self.arduino.disconnect()
-            except Exception as e:
-                print(f"read_arduino:{str(e)}")
-                break    
+                    for message in raw_message.splitlines():
+                        if len(message) <= 0:
+                            continue
+                except KeyboardInterrupt:
+                    print(f"Arduino (KEYBOARD INTERRUPT)")
+                    self.arduino.disconnect()
+                except Exception as e:
+                    print(f"read_arduino:{str(e)}")
+                    break    
 
     def read_algorithm(self):
         while True:
             raw_message = None
-            if self.algorithm.isConnected == False:
+            if self.algorithm.isConnected() == False:
                 self.algorithm.connect()
-            try:
-                raw_message = self.algorithm.read()
-                if raw_message is None:
-                    continue
-                self.write_queue.put_nowait(raw_message)
-            except KeyboardInterrupt:
-                print(f"Algorithm (KEYBOARD INTERRUPT)")
-                self.algorithm.disconnect_client()
-                self.algorithm.disconnect_server()
-            except Exception as e  :
-                print(f'read_algorithm:{e}')
-                break
+            else:
+                try:
+                    raw_message = self.algorithm.read()
+                    if raw_message is None:
+                        continue
+                    self.write_queue.put_nowait(raw_message)
+                except KeyboardInterrupt:
+                    print(f"Algorithm (KEYBOARD INTERRUPT)")
+                    self.algorithm.disconnect_client()
+                    self.algorithm.disconnect_server()
+                except Exception as e  :
+                    print(f'read_algorithm:{e}')
+                    break
 
     def read_android(self):
         while True:
             raw_message = None
-            if self.android.isConnected == False:
+            if self.android.isConnected() == False:
                 self.android.connect()
-            try:
-                raw_message = self.android.read()
-                if raw_message is None:
-                    continue
-                self.write_queue.put_nowait(raw_message)
-            except KeyboardInterrupt:
-                print(f"Android (KEYBOARD INTERRUPT)")
-                self.android.disconnect_client()
-                self.android.disconnect_server()
-            except Exception as e  :
-                print(f'read_android:{e}')
-                break
+            else:
+                try:
+                    raw_message = self.android.read()
+                    if raw_message is None:
+                        continue
+                    self.write_queue.put_nowait(raw_message)
+                except KeyboardInterrupt:
+                    print(f"Android (KEYBOARD INTERRUPT)")
+                    self.android.disconnect_client()
+                    self.android.disconnect_server()
+                except Exception as e  :
+                    print(f'read_android:{e}')
+                    break
 
     def write_target(self):
         while True:

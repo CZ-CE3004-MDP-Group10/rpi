@@ -4,7 +4,7 @@ from configs import AlgorithmConfigs
 
 class Algorithm:
     def __init__(self):
-        self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_S)
+        self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_ip = AlgorithmConfigs.SERVER_IP
         self.port = AlgorithmConfigs.SERVER_PORT

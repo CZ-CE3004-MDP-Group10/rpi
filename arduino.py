@@ -21,8 +21,8 @@ class Arduino:
         while self.isConnected == False:
             try:
                 self.serial.open()
-                self.connected = True
                 print(f"Arduino (CONNECTED) to {self.serial.port}")
+                self.connected = True
             except Exception as e:
                 print(e)
 

@@ -5,7 +5,7 @@ from configs import AndroidConfigs
 
 class Android:
     def __init__(self):
-        # os.system("sudo hciconfig hci0 piscan")
+        os.system("sudo hciconfig hci0 piscan")
         self.server_sock = bluetooth.BluetoothSocket()
         self.port = bluetooth.PORT_ANY
         self.server_sock.bind(("", self.port))
@@ -23,9 +23,9 @@ class Android:
         print("Android (INSTANTIATED)")
 
     def isConnected(self):
-        if self.client_sock != None:
-            return True
-        return False
+        if self.client_sock == None:
+            return False
+        return True
 
     def connect(self):
         while True:
@@ -43,13 +43,15 @@ class Android:
                 print(f"Android (ERROR) connect():{e}")
 
     def disconnect_client(self):
-        self.client_sock.close()
-        self.client_sock = None
-        print("Android (CLIENT DISCONNECTED)")
+        if self.client_sock != None:
+            self.client_sock.close()
+            self.client_sock = None
+            print("Android (CLIENT DISCONNECTED)")
 
     def disconnect_server(self):
-        self.server_sock.close()
-        print("Android (SERVER DISCONNECTED)")
+        if self.server_sock != None:
+            self.server_sock.close()
+            print("Android (SERVER DISCONNECTED)")
 
     def read(self):
         try:
