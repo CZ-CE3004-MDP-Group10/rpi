@@ -25,8 +25,8 @@ class Algorithm:
             try:
                 print(f"Algorithm (WAITING) at {self.server_ip}")
                 if self.client_sock is None:
-                    self.client_sock, self.clientInfo = self.server_sock.accept()
-                    print(f"Algorithm (CONNECTED) to {self.address}")
+                    self.client_sock, self.client_address = self.server_sock.accept()
+                    print(f"Algorithm (CONNECTED) to {self.client_address}")
                     break
             except Exception as e:
                 print(f"Algorithm (ERROR) connect():{e}")

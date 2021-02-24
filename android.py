@@ -34,8 +34,8 @@ class Android:
                 print(f"Android (WAITING) start advertising")
                 if self.client_sock == None:
                     print(f"Android (WAITING) on RFCOMM port {self.port}")
-                    self.client_sock, self.clientInfo = self.server_sock.accept()
-                    print(f"Android (CONNECTED) to {self.client_sock.getpeername} @ {address}")
+                    self.client_sock, self.client_address = self.server_sock.accept()
+                    print(f"Android (CONNECTED) to {self.client_sock.getpeername} @ {self.client_address}")
                     break
                 os.system("sudo hciconfig hci0 noscan")
                 print(f"Android (CONNECTED) stop advertising")
