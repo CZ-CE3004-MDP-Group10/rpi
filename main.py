@@ -15,12 +15,10 @@ class Main:
         # instantiate computer vision module
 
         self.write_queue = Manager().Queue()
-
         self.read_arduino_process = Process(target=self.read_arduino).start()
         self.read_algorithm_process = Process(target=self.read_algorithm).start()
         self.read_android_process = Process(target=self.read_android).start()
-        
-        # self.write_target = Process(target=self.write_target)
+        self.write_target = Process(target=self.write_target).start()
 
     def read_arduino(self):
         while True:
@@ -81,26 +79,31 @@ class Main:
                     break
 
     def write_target(self):
+        print("Write Process (CALLED)")
         while True:
             try:
                 if not self.write_queue.empty():
                     message = self.write_queue.get_nowait()
                     i =  message.split(SEPERATOR)
                     if i[0] == Header.ARDUINO:
-                        if self.arduino.isConnected == True:
-                            self.arduino.write(i)
+                        pass
+                        if self.arduino.isConnected() == True:
+                            self.arduino.write(message)
                         else:
-                            print("Arduino (WRITE) fail, not connected")
+                            self.write_queue.put_nowait(message)
+                            print("Arduino (WRITE) fail, not connected, reconnecting Arduino now...")
+                            self.arduino.connect()
                     elif i[0] == Header.ALGORITHM:
                         if self.algorithm.isConnected == True:
-                            self.algorithm.write(i)
+                            self.algorithm.write(message)
                         else:
-                            print("Algorithm (WRITE) fail, not connected")
+                            print("Algorithm (WRITE) fail, not connected, reconnecting Algorithm now...")
+                            self.algorithm.connect()
                     elif i[0] == Header.ANDROID:
                         if self.android.isConnected == True:
-                            self.android.write(i)
+                            self.android.write(message)
                         else:
-                            print("Android (WRITE) fail, not connected")
+                            print("Android (WRITE) fail, not connected, reconnecting Android now...")
                     else:
                         print("HEADER INFO WRONG")
             except KeyboardInterrupt:
@@ -110,14 +113,11 @@ class Main:
                 break
 
 
-
-
 if __name__ == "__main__":
     main = Main()
-    # main.start()
-    main.write_target()
-
-
+    # main.write_target()
+    while True: 
+        pass
 
     # async def connect(self):
     #     await asyncio.gather(
@@ -142,7 +142,6 @@ if __name__ == "__main__":
     # asyncio.run(main.connect())
     # _thread.start_new_thread(main.writeArduino)
     # _thread.start_new_thread(main.readArduino)
-
     
             # await asyncio.gather(
             #     self.arduino.connect(),

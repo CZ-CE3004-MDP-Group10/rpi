@@ -28,6 +28,9 @@ class Algorithm:
                     self.client_sock, self.client_address = self.server_sock.accept()
                     print(f"Algorithm (CONNECTED) to {self.client_address}")
                     break
+            except KeyboardInterrupt:
+                    print(f"Android (KEYBOARD INTERRUPT)")
+                    self.disconnect_server()
             except Exception as e:
                 print(f"Algorithm (ERROR) connect():{e}")
 
