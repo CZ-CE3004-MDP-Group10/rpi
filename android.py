@@ -7,7 +7,7 @@ class Android:
     def __init__(self):
         os.system("sudo hciconfig hci0 piscan")
         self.server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        self.port = bluetooth.port.ANY
+        self.port = bluetooth.PORT_ANY
         self.server_sock.bind(("", self.port))
         self.server_sock.listen(1)
         bluetooth.advertise_service(
