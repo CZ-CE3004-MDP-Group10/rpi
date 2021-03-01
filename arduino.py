@@ -24,12 +24,12 @@ class Arduino:
         return self.connected
 
     def connect(self):
-        while self.port_exists():
+        if self.port_exists():
             try: 
                 self.serial.open()
                 print(f"Arduino (CONNECTED) to {self.serial.port}")
                 self.connected = True
-                break
+                # break
             except Exception as e:
                 print(e)
 
@@ -62,6 +62,3 @@ class Arduino:
             print(f"Arduino (ERROR) write():{e}")
             self.disconnect() # <<<<<<
             # self.connect()
-
-
-                    

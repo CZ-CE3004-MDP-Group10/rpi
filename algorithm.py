@@ -13,30 +13,29 @@ class Algorithm:
 
         self.client_sock = None
         self.clientInfo = None
+        self.is_connected = False
         print("Algorithm (INSTANTIATED)")
 
     def isConnected(self):
-        if self.client_sock != None:
-            return True
-        return False
+        return self.is_connected
 
     def connect(self):
-        while True:
-            try:
-                print(f"Algorithm (WAITING) at {self.server_ip}")
-                if self.client_sock is None:
-                    self.client_sock, self.client_address = self.server_sock.accept()
-                    print(f"Algorithm (CONNECTED) to {self.client_address}")
-                    break
-            except KeyboardInterrupt:
-                    print(f"Android (KEYBOARD INTERRUPT)")
-                    self.disconnect_server()
-            except Exception as e:
-                print(f"Algorithm (ERROR) connect():{e}")
+        try:
+            print(f"Algorithm (WAITING) at {self.server_ip}")
+            if self.client_sock is None:
+                self.client_sock, self.client_address = self.server_sock.accept()
+                self.is_connected = True
+                print(f"Algorithm (CONNECTED) to {self.client_address} {self.client_sock}")
+        except KeyboardInterrupt:
+                print(f"Android (KEYBOARD INTERRUPT)")
+                self.disconnect_server()
+        except Exception as e:
+            print(f"Algorithm (ERROR) connect():{e}")
 
     def disconnect_client(self):
         self.client_sock.close()
         self.client_sock = None
+        self.is_connected = False
         print("Algorithm (CLIENT DISCONNECTED)")
 
     def disconnect_server(self):
@@ -51,6 +50,7 @@ class Algorithm:
                 return message
             message = None
         except socket.error:
+            print("Algorithm read disconnect client")
             self.disconnect_client()
         except Exception as e:
             print(f"Algorithm (ERROR) read():{e}")

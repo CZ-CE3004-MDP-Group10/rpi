@@ -12,7 +12,7 @@ class ArduinoConfigs:
 
 class AlgorithmConfigs:
     SERVER_IP = '192.168.10.1'
-    SERVER_PORT = 101
+    SERVER_PORT = 30000
     BUFFER_SIZE = 1024
 
 class AndroidConfigs:
@@ -23,4 +23,4 @@ class AndroidConfigs:
     UUID ="00001101-0000-1000-8000-00805f9b34fb"
     BT_NAME = "MDP-group10"
     BUFFER_SIZE = 1024
-    SDP_CHANNEL = 19
+    # SDP_CHANNEL = 19 set to any now
