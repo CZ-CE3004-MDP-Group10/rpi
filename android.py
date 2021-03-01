@@ -7,7 +7,7 @@ class Android:
     def __init__(self):
         os.system("sudo hciconfig hci0 piscan")
         self.server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        self.port = AndroidConfigs.SDP_CHANNEL
+        self.port = bluetooth.port.ANY
         self.server_sock.bind(("", self.port))
         self.server_sock.listen(1)
         bluetooth.advertise_service(
@@ -46,19 +46,19 @@ class Android:
         return True
 
     def connect(self):
-        while True:
-            try:
-                os.system("sudo hciconfig hci0 piscan")
-                print(f"Android (WAITING) start advertising")
-                if self.client_sock == None:
-                    print(f"Android (WAITING) on RFCOMM port {self.port}")
-                    self.client_sock, self.client_address = self.server_sock.accept()
-                    print(f"Android (CONNECTED) to {self.client_sock.getpeername} @ {self.client_address}")
-                    # break
-                os.system("sudo hciconfig hci0 noscan")
-                print(f"Android (CONNECTED) stop advertising")
-            except Exception as e:
-                print(f"Android (ERROR) connect():{e}")
+        # while True:
+        try:
+            os.system("sudo hciconfig hci0 piscan")
+            print(f"Android (WAITING) start advertising")
+            if self.client_sock == None:
+                print(f"Android (WAITING) on RFCOMM port {self.port}")
+                self.client_sock, self.client_address = self.server_sock.accept()
+                print(f"Android (CONNECTED) to {self.client_sock.getpeername} @ {self.client_address}")
+                # break
+            os.system("sudo hciconfig hci0 noscan")
+            print(f"Android (CONNECTED) stop advertising")
+        except Exception as e:
+            print(f"Android (ERROR) connect():{e}")
 
         # while self.client_sock == None:
         #     try:
