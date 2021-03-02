@@ -26,7 +26,8 @@ class ImageCV:
             message = self.client_sock.recv(1024)
             if len(message) > 0:
                 print(f"PiCamera (MESSAGE-FROM): {message}")
-                return message
+                if message.decode("utf-8").strip() == "CV|TAKIMG":
+                    self.take_image()
             else:
                 self.disconnect_client()
             message = None

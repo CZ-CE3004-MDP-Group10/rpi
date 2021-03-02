@@ -7,6 +7,7 @@ from commands import *
 from arduino import Arduino
 from algorithm import Algorithm
 from android import Android
+from cvimage import ImageCV
 
 class Main:
     def __init__(self):
@@ -15,11 +16,13 @@ class Main:
         BaseManager.register('Arduino',Arduino)
         BaseManager.register('Algorithm',Algorithm)
         BaseManager.register('Android',Android)
+        BaseManager.register('ImageCV', ImageCV)
         manager = BaseManager()
         manager.start()
         shared_ard = manager.Arduino()
         shared_alg = manager.Algorithm()
         shared_and = manager.Android()
+        shared_icv = manager.ImageCV()
         
         p1 = Process(target=self.read_algorithm, args=[shared_alg])
         p1.start()
@@ -27,9 +30,11 @@ class Main:
         p2.start()
         p3 = Process(target=self.read_android, args=[shared_and])
         p3.start()
-        p4 = Process(target=self.write_target, args=(shared_ard, shared_alg, shared_and))
+        p4 = Process(target=self.read_imagecv, args=[shared_icv])
         p4.start()
-        p4.join()
+        p5 = Process(target=self.write_target, args=(shared_ard, shared_alg, shared_and))
+        p5.start()
+        p5.join()
 
     def read_arduino(self, arduino):
         while True:
@@ -90,9 +95,6 @@ class Main:
                     print(f'read_android:{e}')
                     break
 
-<<<<<<< Updated upstream
-    def write_target(self, arduino, algorithm, android):
-=======
     def read_imagecv(self, imagecv):
         while True:
             raw_message = None
@@ -115,7 +117,6 @@ class Main:
                     break
 
     def write_target(self, arduino, algorithm, android, imagecv):
->>>>>>> Stashed changes
         print("Write Process (CALLED)")
         while True:
             try:
@@ -138,12 +139,17 @@ class Main:
                             print("Algorithm (WRITE) fail, not connected, reconnecting Algorithm now...")
                             # algorithm.connect()
                     elif i[0] == "AND":
-                        android.write(message)
-                        # if android.isConnected == True:
-                        #     android.write(message)
+                        if android.isConnected == True:
+                            android.write(message)
+                        else:
+                            self.write_queue.put(message)
+                            print("Android (WRITE) fail, not connected, reconnecting Android now...")
+                    # elif i[0] == "CV":
+                        # if imagecv.isConnected == True:
+                        #     imagecv.write(message)
                         # else:
-                        #     # self.write_queue.put(message)
-                            # print("Android (WRITE) fail, not connected, reconnecting Android now...")
+                        #     self.write_queue.put(message)
+                        #     print("Android (WRITE) fail, not connected, reconnecting Android now...")
                     else:
                         print("HEADER INFO WRONG")
             except KeyboardInterrupt:
