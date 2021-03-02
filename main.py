@@ -9,23 +9,9 @@ from algorithm import Algorithm
 from android import Android
 from cvimage import ImageCV
 
-# class ShareManager(BaseManager):
-#     pass
-
-# ShareManger.register('arduino',Arduino)
-# ShareManger.register('algorithm',Algorithm)
-# ShareManger.register('android',Android)
-
 class Main:
     def __init__(self):
-        # self.arduino = Arduino()
-        # self.algorithm = Algorithm()
-        # self.android = Android()
-        # instantiate computer vision module
         self.write_queue = Manager().Queue()
-
-        # self.manager = ShareManager()
-        # self.manager.start()
 
         BaseManager.register('Arduino',Arduino)
         BaseManager.register('Algorithm',Algorithm)
@@ -49,11 +35,6 @@ class Main:
         p5 = Process(target=self.write_target, args=(shared_ard, shared_alg, shared_and))
         p5.start()
         p5.join()
-
-        # self.read_arduino_process = Process(target=self.read_arduino).start()
-        # self.read_algorithm_process = Process(target=self.read_algorithm, args=(self.algorithm, self.write_queue)).start()
-        # self.read_android_process = Process(target=self.read_android).start()
-        # self.write_target = Process(target=self.write_target, args=(self.algorithm,self.write_queue)).start()
 
     def read_arduino(self, arduino):
         while True:
@@ -114,6 +95,12 @@ class Main:
                     print(f'read_android:{e}')
                     break
 
+<<<<<<< HEAD
+=======
+<<<<<<< Updated upstream
+    def write_target(self, arduino, algorithm, android):
+=======
+>>>>>>> main
     def read_imagecv(self, imagecv):
         while True:
             raw_message = None
@@ -124,6 +111,11 @@ class Main:
                     raw_message = imagecv.read()
                     if raw_message is None:
                         continue
+<<<<<<< HEAD
+=======
+                    elif raw_message.decode("utf-8").strip() == "CV|TAKIMG":
+                        imagecv.take_image()
+>>>>>>> main
                     # self.write_queue.put(raw_message)
                 except KeyboardInterrupt:
                     print(f"Imagecv (KEYBOARD INTERRUPT)")
@@ -134,6 +126,10 @@ class Main:
                     break
 
     def write_target(self, arduino, algorithm, android, imagecv):
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> main
         print("Write Process (CALLED)")
         while True:
             try:
