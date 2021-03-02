@@ -7,7 +7,7 @@ sock.connect(("192.168.10.1",30000))
 movement = ("w1", "a2","s5","w10")
 try:
     for i in movement:
-        message = "ARD"+"|"+i
+        message = "ALG"+"|"+i
         message = message.encode("utf-8")
         sock.send(message)
         print(message)

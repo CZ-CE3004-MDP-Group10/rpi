@@ -6,6 +6,7 @@ class Algorithm:
     def __init__(self):
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # self.server_sock.setblocking(False)
         self.server_ip = AlgorithmConfigs.SERVER_IP
         self.port = AlgorithmConfigs.SERVER_PORT
         self.server_sock.bind((self.server_ip, self.port))
@@ -44,10 +45,12 @@ class Algorithm:
     
     def read(self):
         try:
-            message = self.client_sock.recv(AlgorithmConfigs.BUFFER_SIZE).decode("utf-8").strip()
+            message = self.client_sock.recv(AlgorithmConfigs.BUFFER_SIZE)
             if len(message) > 0:
                 print(f"Algorithm (MESSAGE-FROM): {message}")
-                return message
+                return message.decode("utf-8").strip()
+            else:
+                self.disconnect_client()
             message = None
         except socket.error:
             print("Algorithm read disconnect client")

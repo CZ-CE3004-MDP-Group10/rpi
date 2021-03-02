@@ -81,7 +81,6 @@ class Main:
                     raw_message = algorithm.read()
                     if raw_message is None:
                         continue
-                    print(raw_message)
                     self.write_queue.put(raw_message)
                 except KeyboardInterrupt:
                     print(f"Algorithm (KEYBOARD INTERRUPT)")
@@ -120,7 +119,6 @@ class Main:
                     if i[0] == "ARD":
                         if arduino.isConnected() == True:
                             arduino.write(message)
-                            print("writting to arduino")
                         else:
                             self.write_queue.put(message)
                             print("Arduino (WRITE) fail, not connected, reconnecting Arduino now...")
@@ -128,7 +126,6 @@ class Main:
                     elif i[0] == "ALG":
                         if algorithm.isConnected() == True:
                             algorithm.write(message)
-                            print("writting to Algo")
                         else:
                             self.write_queue.put(message)
                             print("Algorithm (WRITE) fail, not connected, reconnecting Algorithm now...")

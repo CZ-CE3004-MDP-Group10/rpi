@@ -21,32 +21,12 @@ class Android:
         self.client_sock = None
         print("Android (INSTANTIATED)")
 
-        # os.system("sudo hciconfig hci0 piscan")
-        # self.client_sock = None
-        # self.server_sock = bluetooth.BluetoothSocket()
-        # self.UUID = AndroidConfigs.UUID
-        # self.port = AndroidConfigs.SDP_CHANNEL
-        
-        # self.server_sock.bind(("", self.port))
-        # self.server_sock.listen(1)
-        # bluetooth.advertise_service(
-        #         sock = self.server_sock,
-        #         name = AndroidConfigs.BT_NAME,
-        #         service_id = self.UUID,
-        #         service_classes = [self.UUID, bluetooth.SERIAL_PORT_CLASS],
-        #         profiles = [bluetooth.SERIAL_PORT_PROFILE]
-        #         )
-        # print("Android (INSTANTIATED)")
-        # self.connected = False
-        # print(f"Android (WAITING) on RFCOMM port {self.port}")
-
     def isConnected(self):
         if self.client_sock == None:
             return False
         return True
 
     def connect(self):
-        # while True:
         try:
             os.system("sudo hciconfig hci0 piscan")
             print(f"Android (WAITING) start advertising")
@@ -54,23 +34,10 @@ class Android:
                 print(f"Android (WAITING) on RFCOMM port {self.port}")
                 self.client_sock, self.client_address = self.server_sock.accept()
                 print(f"Android (CONNECTED) to {self.client_sock.getpeername} @ {self.client_address}")
-                # break
             os.system("sudo hciconfig hci0 noscan")
             print(f"Android (CONNECTED) stop advertising")
         except Exception as e:
             print(f"Android (ERROR) connect():{e}")
-
-        # while self.client_sock == None:
-        #     try:
-        #         print("android trying to connect......")
-        #         self.client_sock, address = self.server_sock.accept()
-        #         print(f"Android (CONNECTED) to {self.client_sock.getpeername} @ {address}")
-        #         os.system("sudo hciconfig hci0 noscan")
-        #         self.connected = True
-        #         break
-        #     except Exception as e:
-        #         self.disconnect()
-        #         print(e)
 
     def disconnect_client(self):
         if self.client_sock != None:
@@ -85,10 +52,12 @@ class Android:
 
     def read(self):
         try:
-            message = self.client_sock.recv(AndroidConfigs.BUFFER_SIZE).decode("utf-8").strip()
+            message = self.client_sock.recv(AndroidConfigs.BUFFER_SIZE)
             if len(message) > 0 :
                 print(f"Android (MESSAGE-FROM): {message}")
-                return message
+                return message.decode("utf-8").strip()
+            else:
+                self.disconnect_client()
             message = None
         except Exception as e:
             self.disconnect_client()
