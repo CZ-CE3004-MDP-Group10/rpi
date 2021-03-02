@@ -144,16 +144,17 @@ class Main:
                         if arduino.isConnected() == True:
                             arduino.write(message)
                         else:
-                            self.write_queue.put(message)
+                            pass
+                            # self.write_queue.put(message)
                             print("Arduino (WRITE) fail, not connected, reconnecting Arduino now...")
-                            arduino.connect()
+                            # arduino.connect()
                     elif i[0] == "ALG":
                         if algorithm.isConnected() == True:
                             algorithm.write(message)
                         else:
-                            self.write_queue.put(message)
+                            # self.write_queue.put(message)
                             print("Algorithm (WRITE) fail, not connected, reconnecting Algorithm now...")
-                            algorithm.connect()
+                            # algorithm.connect()
                     elif i[0] == "AND":
                         if android.isConnected == True:
                             android.write(message)
