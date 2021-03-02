@@ -38,7 +38,6 @@ class ImageCV:
             print(f"AlgPiCameraorithm (ERROR) read():{e}")
         return None
 
-
     def take_image(self, no_pic=1):
         label = "image_name"
         image_directory = './captured_images/'
@@ -50,7 +49,6 @@ class ImageCV:
             no_pic = no_pic + 1
             self.send_image(image_name)
 
-
     def send_image(self,image_name):
         #open file
         f = open(image_name, 'rb')
@@ -60,7 +58,6 @@ class ImageCV:
             self.server_sock.send(image_file)
             image_file.read(1024)
         f.close()
-
 
     def connect(self):
         try:
@@ -75,13 +72,11 @@ class ImageCV:
         except Exception as e:
             print(f"PiCamera (ERROR) connect():{e}")
 
-
     def disconnect_client(self):
         self.client_sock.close()
         self.client_sock = None
         self.is_connected = False
         print("PiCamera (CLIENT DISCONNECTED)")
-
 
     def disconnect_server(self):
         self.server_sock.close()

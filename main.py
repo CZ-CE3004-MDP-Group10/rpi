@@ -158,7 +158,6 @@ class Main:
                 print(f"write_target:{e}")
                 break
 
-
 if __name__ == "__main__":
     main = Main()
     # main.write_target()
