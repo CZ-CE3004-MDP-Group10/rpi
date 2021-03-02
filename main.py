@@ -8,23 +8,9 @@ from arduino import Arduino
 from algorithm import Algorithm
 from android import Android
 
-# class ShareManager(BaseManager):
-#     pass
-
-# ShareManger.register('arduino',Arduino)
-# ShareManger.register('algorithm',Algorithm)
-# ShareManger.register('android',Android)
-
 class Main:
     def __init__(self):
-        # self.arduino = Arduino()
-        # self.algorithm = Algorithm()
-        # self.android = Android()
-        # instantiate computer vision module
         self.write_queue = Manager().Queue()
-
-        # self.manager = ShareManager()
-        # self.manager.start()
 
         BaseManager.register('Arduino',Arduino)
         BaseManager.register('Algorithm',Algorithm)
@@ -44,11 +30,6 @@ class Main:
         p4 = Process(target=self.write_target, args=(shared_ard, shared_alg, shared_and))
         p4.start()
         p4.join()
-
-        # self.read_arduino_process = Process(target=self.read_arduino).start()
-        # self.read_algorithm_process = Process(target=self.read_algorithm, args=(self.algorithm, self.write_queue)).start()
-        # self.read_android_process = Process(target=self.read_android).start()
-        # self.write_target = Process(target=self.write_target, args=(self.algorithm,self.write_queue)).start()
 
     def read_arduino(self, arduino):
         while True:
@@ -109,7 +90,32 @@ class Main:
                     print(f'read_android:{e}')
                     break
 
+<<<<<<< Updated upstream
     def write_target(self, arduino, algorithm, android):
+=======
+    def read_imagecv(self, imagecv):
+        while True:
+            raw_message = None
+            if not imagecv.isConnected():
+               imagecv.connect()
+            else:
+                try:
+                    raw_message = imagecv.read()
+                    if raw_message is None:
+                        continue
+                    elif raw_message.decode("utf-8").strip() == "CV|TAKIMG":
+                        imagecv.take_image()
+                    # self.write_queue.put(raw_message)
+                except KeyboardInterrupt:
+                    print(f"Imagecv (KEYBOARD INTERRUPT)")
+                    imagecv.disconnect_client()
+                    imagecv.disconnect_server()
+                except Exception as e  :
+                    print(f'Imagecv:{e}')
+                    break
+
+    def write_target(self, arduino, algorithm, android, imagecv):
+>>>>>>> Stashed changes
         print("Write Process (CALLED)")
         while True:
             try:
