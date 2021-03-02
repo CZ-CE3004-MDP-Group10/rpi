@@ -95,12 +95,6 @@ class Main:
                     print(f'read_android:{e}')
                     break
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-    def write_target(self, arduino, algorithm, android):
-=======
->>>>>>> main
     def read_imagecv(self, imagecv):
         while True:
             raw_message = None
@@ -111,11 +105,8 @@ class Main:
                     raw_message = imagecv.read()
                     if raw_message is None:
                         continue
-<<<<<<< HEAD
-=======
                     elif raw_message.decode("utf-8").strip() == "CV|TAKIMG":
                         imagecv.take_image()
->>>>>>> main
                     # self.write_queue.put(raw_message)
                 except KeyboardInterrupt:
                     print(f"Imagecv (KEYBOARD INTERRUPT)")
@@ -126,10 +117,6 @@ class Main:
                     break
 
     def write_target(self, arduino, algorithm, android, imagecv):
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> main
         print("Write Process (CALLED)")
         while True:
             try:
