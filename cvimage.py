@@ -1,5 +1,7 @@
 import socket
 from picamera import PiCamera
+import datetime
+import os
 
 class ImageCV:
     def __init__(self):
@@ -17,17 +19,19 @@ class ImageCV:
 
         self.camera = PiCamera()
         self.camera.resolution = (1024, 768)
+        self.time = datetime.datetime
+        self.img_dir = '0cv/captured_images/'
+        self.img_name = 'image'
 
     def isConnected(self):
         return self.is_connected
 
     def read(self):
         try:
-            message = self.client_sock.recv(1024)
+            message = self.client_sock.recv(1024).decode("utf-8")
             if len(message) > 0:
                 print(f"PiCamera (MESSAGE-FROM): {message}")
-                if message.decode("utf-8").strip() == "CV|TAKIMG":
-                    self.take_image()
+                return message
             else:
                 self.disconnect_client()
             message = None
@@ -35,29 +39,34 @@ class ImageCV:
             print("PiCamera read disconnect client")
             self.disconnect_client()
         except Exception as e:
-            print(f"AlgPiCameraorithm (ERROR) read():{e}")
+            print(f"PiCameraorithm (ERROR) read():{e}")
         return None
 
-    def take_image(self, no_pic=1):
-        label = "image_name"
-        image_directory = './captured_images/'
-        while 0 < no_pic:
-            # to do - take pic and save to directory in rpi
-            image_name = f"{image_directory}{label}_{no_pic}.jpg"
-            self.camera.capture(image_name)
-            print(f"Image: {image_name} captured")
-            no_pic = no_pic + 1
-            self.send_image(image_name)
+    def take_image(self):
+        # to do - take pic and save to directory in rpi
+        image_name = f"{self.img_dir}{self.img_name}.jpg"
+        self.camera.capture(image_name)
+        print(f"take_image: {image_name} captured")
+        return image_name
 
     def send_image(self,image_name):
-        #open file
-        f = open(image_name, 'rb')
-        image_file = f.read(1024)
-        while image_file:
-            print("sending image")
-            self.server_sock.send(image_file)
-            image_file.read(1024)
-        f.close()
+        try:
+            file_size = os.path.getsize(image_name)
+            self.client_sock.send(f"{self.img_name}|{file_size}".encode())
+            with open(image_name, 'rb') as f:
+                remaining = file_size
+                while True:
+                    bytes_read = f.read(1024)
+                    if not bytes_read:
+                        break
+                    self.client_sock.sendall(bytes_read)
+                print(f"{image_name} sent")
+            self.disconnect_client()
+        except socket.error:
+            print("PiCamera (ERROR) send_image disconnect client")
+            self.disconnect_client()
+        except Exception as e:
+            print(f"PiCamera (ERROR) send_image():{e}")
 
     def connect(self):
         try:

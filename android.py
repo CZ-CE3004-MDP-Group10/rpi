@@ -80,4 +80,3 @@ class Android:
 #         main.write(f"Write to bluetooth slave {i}\n")
 #         i += 1
 #     main.disconnect()
-    

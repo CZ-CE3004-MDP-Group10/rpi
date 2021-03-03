@@ -97,16 +97,17 @@ class Main:
 
     def read_imagecv(self, imagecv):
         while True:
-            raw_message = None
+            message = None
             if not imagecv.isConnected():
                imagecv.connect()
             else:
                 try:
-                    raw_message = imagecv.read()
-                    if raw_message is None:
+                    message = imagecv.read()
+                    if message is None:
                         continue
-                    elif raw_message.decode("utf-8").strip() == "CV|TAKIMG":
-                        imagecv.take_image()
+                    elif message == "CV|TAKIMG":
+                        file_name =imagecv.take_image()
+                        imagecv.send_image(file_name)
                     # self.write_queue.put(raw_message)
                 except KeyboardInterrupt:
                     print(f"Imagecv (KEYBOARD INTERRUPT)")
@@ -116,7 +117,7 @@ class Main:
                     print(f'Imagecv:{e}')
                     break
 
-    def write_target(self, arduino, algorithm, android, imagecv):
+    def write_target(self, arduino, algorithm, android):
         print("Write Process (CALLED)")
         while True:
             try:
@@ -129,21 +130,24 @@ class Main:
                         else:
                             pass
                             # self.write_queue.put(message)
-                            print("Arduino (WRITE) fail, not connected, reconnecting Arduino now...")
+                            print("Arduino (WRITE) fail, not connected")
                             # arduino.connect()
                     elif i[0] == "ALG":
                         if algorithm.isConnected() == True:
                             algorithm.write(message)
                         else:
                             # self.write_queue.put(message)
-                            print("Algorithm (WRITE) fail, not connected, reconnecting Algorithm now...")
+                            print("Algorithm (WRITE) fail, not connected")
                             # algorithm.connect()
                     elif i[0] == "AND":
+                        android.write(message)
                         if android.isConnected == True:
-                            android.write(message)
+                            # android.write(message)
+                            pass
                         else:
-                            self.write_queue.put(message)
-                            print("Android (WRITE) fail, not connected, reconnecting Android now...")
+                            # self.write_queue.put(message)
+                            # print("Android (WRITE) fail, not connected, reconnecting Android now...")
+                            pass
                     # elif i[0] == "CV":
                         # if imagecv.isConnected == True:
                         #     imagecv.write(message)
