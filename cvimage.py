@@ -2,6 +2,7 @@ import socket
 from picamera import PiCamera
 import datetime
 import os
+import buffer
 
 class ImageCV:
     def __init__(self):
@@ -20,7 +21,7 @@ class ImageCV:
         self.camera = PiCamera()
         self.camera.resolution = (1024, 768)
         self.time = datetime.datetime
-        self.img_dir = '0cv/captured_images/'
+        self.img_dir = '../0cv/captured_images/'
         self.img_name = 'image'
 
     def isConnected(self):
@@ -51,16 +52,25 @@ class ImageCV:
 
     def send_image(self,image_name):
         try:
+            sbuf = buffer.Buffer(sock)
+            sbuf.put_utf8(image_name)
             file_size = os.path.getsize(image_name)
-            self.client_sock.send(f"{self.img_name}|{file_size}".encode())
+            sbuf.put_utf8(str(file_size))
+
+            self.client_sock.send(f"{self.image_name}|{file_size}".encode())
+
             with open(image_name, 'rb') as f:
-                remaining = file_size
-                while True:
-                    bytes_read = f.read(1024)
-                    if not bytes_read:
-                        break
-                    self.client_sock.sendall(bytes_read)
+                # remaining = file_size
+                # while True:
+                #     bytes_read = f.read(1024)
+                #     if not bytes_read:
+                #         break
+                #     self.client_sock.sendall(bytes_read)
+                sbuf.put_bytes(f.read())
+
                 print(f"{image_name} sent")
+
+
             self.disconnect_client()
         except socket.error:
             print("PiCamera (ERROR) send_image disconnect client")
