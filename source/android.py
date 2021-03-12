@@ -1,7 +1,6 @@
-import asyncio
 import bluetooth
 import os
-from configs import AndroidConfigs
+from utils.configs import AndroidConfigs
 
 class Android:
     def __init__(self):

@@ -1,6 +1,6 @@
 import socket
 
-from configs import AlgorithmConfigs
+from utils.configs import AlgorithmConfigs
 
 class Algorithm:
     def __init__(self):

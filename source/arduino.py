@@ -1,8 +1,7 @@
-import asyncio
 import serial
 import os
 
-from configs import ArduinoConfigs
+from utils.configs import ArduinoConfigs
 
 class Arduino:
     def __init__(self):

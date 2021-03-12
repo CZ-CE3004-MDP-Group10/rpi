@@ -4,10 +4,10 @@ import time
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect(("192.168.10.1",30000))
 
-movement = ("w1", "a2","s5","w10")
+commands = ("(0,0)", "(9,4)")
 try:
-    for i in movement:
-        message = "AND"+"|"+i
+    for i in commands:
+        message = "CV"+"|"+i
         message = message.encode("utf-8")
         sock.send(message)
         print(message)

@@ -3,7 +3,7 @@ import time
 from multiprocessing import Process, Value, Queue, Manager
 from multiprocessing.managers import BaseManager
 
-from commands import *
+from utils.commands import *
 from arduino import Arduino
 from algorithm import Algorithm
 from android import Android
@@ -24,7 +24,7 @@ class Main:
         shared_and = manager.Android()
         shared_icv = manager.ImageCV()
         
-        p1 = Process(target=self.read_algorithm, args=[shared_alg])
+        p1 = Process(target=self.read_algorithm, args=(shared_alg, shared_icv))
         p1.start()
         p2 = Process(target=self.read_arduino, args=[shared_ard])
         p2.start()
@@ -32,7 +32,7 @@ class Main:
         p3.start()
         p4 = Process(target=self.read_imagecv, args=[shared_icv])
         p4.start()
-        p5 = Process(target=self.write_target, args=(shared_ard, shared_alg, shared_and))
+        p5 = Process(target=self.write_target, args=(shared_ard, shared_alg, shared_and, shared_icv))
         p5.start()
         p5.join()
 
@@ -57,7 +57,7 @@ class Main:
                     print(f"read_arduino:{str(e)}")
                     break    
 
-    def read_algorithm(self, algorithm):
+    def read_algorithm(self, algorithm, imagecv):
         while True:
             raw_message = None
             if not algorithm.isConnected():
@@ -67,7 +67,14 @@ class Main:
                     raw_message = algorithm.read()
                     if raw_message is None:
                         continue
-                    self.write_queue.put(raw_message)
+                    else:
+                        message = raw_message.split(SEPERATOR)
+                        if message[0] == "CV":
+                            coordinate = message[1]
+                            file_name = imagecv.take_image(coordinate)
+                            self.write_queue.put(f'CV|{file_name}')
+                        else:
+                            self.write_queue.put(raw_message)
                 except KeyboardInterrupt:
                     print(f"Algorithm (KEYBOARD INTERRUPT)")
                     algorithm.disconnect_client()
@@ -105,10 +112,12 @@ class Main:
                     message = imagecv.read()
                     if message is None:
                         continue
-                    elif message == "CV|TAKIMG":
-                        file_name =imagecv.take_image()
-                        imagecv.send_image(file_name)
-                    # self.write_queue.put(raw_message)
+                    # for testing cv to send takeimg, infuture alg to send CV|TAKIMG
+                    # elif message == "CV|TAKIMG":
+                    #     file_name = imagecv.take_image()
+                    #     imagecv.send_image(file_name)
+                    else:
+                        self.write_queue.put(message)
                 except KeyboardInterrupt:
                     print(f"Imagecv (KEYBOARD INTERRUPT)")
                     imagecv.disconnect_client()
@@ -117,7 +126,7 @@ class Main:
                     print(f'Imagecv:{e}')
                     break
 
-    def write_target(self, arduino, algorithm, android):
+    def write_target(self, arduino, algorithm, android, cv):
         print("Write Process (CALLED)")
         while True:
             try:
@@ -148,12 +157,17 @@ class Main:
                             # self.write_queue.put(message)
                             # print("Android (WRITE) fail, not connected, reconnecting Android now...")
                             pass
-                    # elif i[0] == "CV":
-                        # if imagecv.isConnected == True:
-                        #     imagecv.write(message)
-                        # else:
-                        #     self.write_queue.put(message)
-                        #     print("Android (WRITE) fail, not connected, reconnecting Android now...")
+                    elif i[0] == "CV":
+                        # cv.write(message)
+                        print(f"{i[1]} <- image name")
+                        cv.send_image(i[1])
+                        if cv.isConnected == True:
+                            # imagecv.write(message)
+                            pass
+                        else:
+                            # self.write_queue.put(message)
+                            # print("CV (WRITE) fail, not connected, reconnecting Android now...")
+                            pass
                     else:
                         print("HEADER INFO WRONG")
             except KeyboardInterrupt:
@@ -164,6 +178,5 @@ class Main:
 
 if __name__ == "__main__":
     main = Main()
-    # main.write_target()
     while True: 
         pass
