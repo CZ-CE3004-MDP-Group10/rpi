@@ -2,7 +2,6 @@ import socket
 from picamera import PiCamera
 import datetime
 import os
-import utils.buffer as buffer
 
 class ImageCV:
     def __init__(self):
@@ -15,7 +14,6 @@ class ImageCV:
 
         self.client_sock = None
         self.clientInfo = None
-        self.connbuf = None
         self.is_connected = False
 
         self.buffer = b''
@@ -23,8 +21,9 @@ class ImageCV:
 
         self.camera = PiCamera()
         self.camera.resolution = (1024, 768)
-        self.time = datetime.datetime
-        self.img_dir = '0cv/captured_images'
+        current_time = datetime.datetime.now().strftime("%d_%m_%y_%H:%M:%S")
+        self.img_dir = f'0cv/captured_images/{current_time}'
+        os.makedirs(self.img_dir)
         self.img_name_ctr = 1
 
 
@@ -34,19 +33,10 @@ class ImageCV:
 
     def read(self):
         try:
-            # while b'\x00' not in self.buffer:
-            #     data = self.sock.recv(1024)
-            #     if not data:
-            #         return ''
-            #     self.buffer += data
-            # # split off the string from the buffer.
-            # data, _,self.buffer = self.buffer.partition(b'\x00')
-            # return data.decode()
-
-            message = self.connbuf.get_utf8()
+            message = self.client_sock.recv(1024)
             if len(message) > 0:
                 print(f"CVIMAGE (MESSAGE-FROM): {message}")
-                return message
+                return message.decode()
         except socket.error:
             print("CVIMAGE read disconnect client")
             self.disconnect_client()
@@ -57,15 +47,16 @@ class ImageCV:
     def write(self, message):
         try:
             print(f"CVIMAGE (MESSAGE-TO): {message}")
-            # self.sock.sendall(message.encode() + b'\x00')
-            self.connbuf.put_utf8(message)
+            self.client_sock.send(message.encode('utf-8'))
         except socket.error:
             self.disconnect_client()
         except Exception as e:
             print(f"CVIMAGE (ERROR) write():{e}")
 
     def take_image(self, coordinate):
-        # take pic and save to directory in rpi
+        ""
+        
+        ""
         img_name = f"{self.img_name_ctr}{coordinate}"
         self.camera.capture(f"{self.img_dir}/{img_name}.jpg")
         print(f"CVIMAGE (take_image) image {img_name} captured")
@@ -74,24 +65,20 @@ class ImageCV:
 
     def send_image(self, img_name):
         try:
-            # send image name
-            # self.sock.sendall(img_name.encode() + b'\x00')
-            self.connbuf.put_utf8(img_name)
-            print(f"CVIMAGE (send_image): {img_name}")
-            # send image size
-            image_size = os.path.getsize(f"{self.img_dir}/{img_name}.jpg")
-            # self.sock.sendall(image_size.encode() + b'\x00')
-            self.connbuf.put_utf8(str(image_size))
-            print(f"CVIMAGE (send_image): {image_size}")
-            # send image data
-            with open(f"{self.img_dir}/{img_name}.jpg", 'rb') as f:
-                # self.sock.sendall(f.read())
-                self.connbuf.put_bytes(f.read())
+            file_size = str(os.path.getsize(f"{self.img_dir}/{img_name}.jpg"))
+            print(f"{img_name} - {file_size}")
+            self.write(f"{img_name}|{file_size}")
+            file = open(f"{self.img_dir}/{img_name}.jpg",'rb')
+            l = file.read(1024)
+            while(l):
+                self.client_sock.send(l)
+                l = file.read(1024)
+            file.close()
             print(f'CVIMAGE (send_image) File Sent')
             
         except socket.error:
             print("CVIMAGE (ERROR) send_image disconnect client")
-            self.disconnect_client()
+            # self.disconnect_client()
         except Exception as e:
             print(f"CVIMAGE (ERROR) send_image():{e}")
 
@@ -100,7 +87,6 @@ class ImageCV:
             print(f"CVIMAGE (WAITING) at {self.server_ip}")
             if self.client_sock is None:
                 self.client_sock, self.client_address = self.server_sock.accept()
-                self.connbuf = buffer.Buffer(self.client_sock)
                 self.is_connected = True
                 print(f"CVIMAGE (CONNECTED) to {self.client_address} {self.client_sock}")
         except KeyboardInterrupt:

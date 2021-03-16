@@ -103,19 +103,20 @@ class Main:
                     break
 
     def read_imagecv(self, imagecv):
+        i = 0
         while True:
             message = None
             if not imagecv.isConnected():
                imagecv.connect()
             else:
                 try:
+                    # if i == 0:
+                    #     image = imagecv.take_image("1(7,0,0)")
+                    #     imagecv.send_image(image)
+                    #     i = 1
                     message = imagecv.read()
                     if message is None:
                         continue
-                    # for testing cv to send takeimg, infuture alg to send CV|TAKIMG
-                    # elif message == "CV|TAKIMG":
-                    #     file_name = imagecv.take_image()
-                    #     imagecv.send_image(file_name)
                     else:
                         self.write_queue.put(message)
                 except KeyboardInterrupt:
@@ -138,36 +139,32 @@ class Main:
                             arduino.write(message)
                         else:
                             pass
-                            # self.write_queue.put(message)
                             print("Arduino (WRITE) fail, not connected")
-                            # arduino.connect()
                     elif i[0] == "ALG":
                         if algorithm.isConnected() == True:
                             algorithm.write(message)
                         else:
-                            # self.write_queue.put(message)
                             print("Algorithm (WRITE) fail, not connected")
-                            # algorithm.connect()
                     elif i[0] == "AND":
-                        android.write(message)
+                        # android.write(message)
                         if android.isConnected == True:
-                            # android.write(message)
+                            android.write(message)
                             pass
                         else:
-                            # self.write_queue.put(message)
-                            # print("Android (WRITE) fail, not connected, reconnecting Android now...")
+                            print("Android (WRITE) fail, not connected")
                             pass
                     elif i[0] == "CV":
-                        # cv.write(message)
-                        print(f"{i[1]} <- image name")
-                        cv.send_image(i[1])
-                        if cv.isConnected == True:
-                            # imagecv.write(message)
-                            pass
+                        if i[1] == "Q":
+                            cv.write(i[1])
                         else:
-                            # self.write_queue.put(message)
-                            # print("CV (WRITE) fail, not connected, reconnecting Android now...")
-                            pass
+                            cv.send_image(i[1])
+                        
+                        # if cv.isConnected == True:
+                        #     # cv.send_image(i[1])
+                        #     pass
+                        # else:
+                        #     print("CV (WRITE) fail, not connected")
+                        #     pass
                     else:
                         print("HEADER INFO WRONG")
             except KeyboardInterrupt:
