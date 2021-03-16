@@ -158,13 +158,6 @@ class Main:
                             cv.write(i[1])
                         else:
                             cv.send_image(i[1])
-                        
-                        # if cv.isConnected == True:
-                        #     # cv.send_image(i[1])
-                        #     pass
-                        # else:
-                        #     print("CV (WRITE) fail, not connected")
-                        #     pass
                     else:
                         print("HEADER INFO WRONG")
             except KeyboardInterrupt:
