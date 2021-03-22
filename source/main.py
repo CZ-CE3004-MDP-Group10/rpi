@@ -141,12 +141,6 @@ class Main:
                             print("Algorithm (WRITE) fail, not connected")
                     elif i[0] == "AND":
                         android.write(message)
-                        if android.isConnected == True:
-                            # android.write(message)
-                            pass
-                        else:
-                            print("Android (WRITE) fail, not connected")
-                            pass
                     elif i[0] == "CV":
                         if i[1] == "Q":
                             cv.write(i[1])
