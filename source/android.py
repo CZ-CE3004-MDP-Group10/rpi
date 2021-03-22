@@ -68,7 +68,7 @@ class Android:
             print(f"Android (MESSAGE-TO): {message}")
             self.client_sock.send(message.encode("utf-8"))
         except Exception as e:
-            self.disconnect_client()
+            # self.disconnect_client() # <<<<<<<
             print(f"Android (ERROR) write():{e}")
     
 # if __name__ == "__main__":

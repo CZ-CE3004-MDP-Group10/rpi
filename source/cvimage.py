@@ -69,10 +69,10 @@ class ImageCV:
             print(f"{img_name} - {file_size}")
             self.write(f"{img_name}|{file_size}")
             file = open(f"{self.img_dir}/{img_name}.jpg",'rb')
-            l = file.read(1024)
-            while(l):
-                self.client_sock.send(l)
-                l = file.read(1024)
+            
+            buffer = file.read()
+            self.client_sock.sendall(buffer)
+            
             file.close()
             print(f'CVIMAGE (send_image) File Sent')
             

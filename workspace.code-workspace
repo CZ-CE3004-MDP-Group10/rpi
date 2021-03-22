@@ -2,10 +2,6 @@
 	"folders": [
 		{
 			"path": "./source"
-		},
-		{
-			"name": "SSH FS - mdp-rpi",
-			"uri": "ssh://mdp-rpi/"
 		}
 	],
 	"settings": {

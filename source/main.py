@@ -67,7 +67,7 @@ class Main:
                         continue
                     else:
                         message = raw_message.split(SEPERATOR)
-                        if message[0] == "CV":
+                        if message[0] == "CV" and message[1] != "Q": # <<<<<
                             coordinate = message[1]
                             file_name = imagecv.take_image(coordinate)
                             self.write_queue.put(f'CV|{file_name}')
@@ -108,10 +108,6 @@ class Main:
                imagecv.connect()
             else:
                 try:
-                    # if i == 0:
-                    #     image = imagecv.take_image("1(7,0,0)")
-                    #     imagecv.send_image(image)
-                    #     i = 1
                     message = imagecv.read()
                     if message is None:
                         continue
@@ -144,9 +140,9 @@ class Main:
                         else:
                             print("Algorithm (WRITE) fail, not connected")
                     elif i[0] == "AND":
-                        # android.write(message)
+                        android.write(message)
                         if android.isConnected == True:
-                            android.write(message)
+                            # android.write(message)
                             pass
                         else:
                             print("Android (WRITE) fail, not connected")
