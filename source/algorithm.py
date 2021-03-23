@@ -45,10 +45,11 @@ class Algorithm:
     
     def read(self):
         try:
-            message = self.client_sock.recv(AlgorithmConfigs.BUFFER_SIZE)
+            raw_message = self.client_sock.recv(AlgorithmConfigs.BUFFER_SIZE)
+            message = raw_message.decode("utf-8").strip().strip('\x00')
             if len(message) > 0:
                 print(f"Algorithm (MESSAGE-FROM): {message}")
-                return message.decode("utf-8").strip()
+                return message
             else:
                 self.disconnect_client()
             message = None
@@ -62,7 +63,8 @@ class Algorithm:
     def write(self, message):
         try:
             print(f"Algorithm (MESSAGE-TO): {message}")
-            self.client_sock.send(message.encode("utf-8"))
+            buffer = message +"\x00"*max(AlgorithmConfigs.BUFFER_SIZE-len(message ),0)
+            self.client_sock.send(buffer.encode('utf-8'))
         except socket.error:
             self.disconnect_client()
         except Exception as e:
