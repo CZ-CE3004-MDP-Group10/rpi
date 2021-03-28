@@ -34,6 +34,7 @@ class Algorithm:
             print(f"Algorithm (ERROR) connect():{e}")
 
     def disconnect_client(self):
+        print("Algorithm (CLIENT DISCONNECTED) CALLED")
         self.client_sock.close()
         self.client_sock = None
         self.is_connected = False
@@ -50,8 +51,6 @@ class Algorithm:
             if len(message) > 0:
                 print(f"Algorithm (MESSAGE-FROM): {message}")
                 return message
-            else:
-                self.disconnect_client()
             message = None
         except socket.error:
             print("Algorithm read disconnect client")

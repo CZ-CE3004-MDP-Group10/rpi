@@ -55,8 +55,6 @@ class Android:
             if len(message) > 0 :
                 print(f"Android (MESSAGE-FROM): {message}")
                 return message.decode("utf-8").strip()
-            else:
-                self.disconnect_client()
             message = None
         except Exception as e:
             self.disconnect_client()
@@ -66,9 +64,9 @@ class Android:
     def write(self, message):
         try:
             print(f"Android (MESSAGE-TO): {message}")
-            self.client_sock.send(message.encode("utf-8"))
+            # buffer = message +"\x00"*max(AlgorithmConfigs.BUFFER_SIZE-len(message ),0)
+            self.client_sock.send(message.encode('utf-8'))
         except Exception as e:
-            # self.disconnect_client() # <<<<<<<
             print(f"Android (ERROR) write():{e}")
     
 # if __name__ == "__main__":

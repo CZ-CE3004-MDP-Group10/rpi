@@ -1,63 +1,80 @@
-import serial
+import bluetooth
 import os
+from utils.configs import AndroidConfigs
 
-from utils.configs import ArduinoConfigs
-
-class Arduino:
+class Android:
     def __init__(self):
-        self.serial = serial.Serial() 
-        self.serial.port = ArduinoConfigs.SERIAL_PORT
-        self.serial.baudrate = ArduinoConfigs.BAUD_RATE
-        self.serial.write_timeout = ArduinoConfigs.WRITE_TIMEOUT
-        self.connected = False
-        print("Arduino (INSTANTIATED)")
-    
-    def port_exists(self):
-        try:
-            os.stat(self.serial.port)
-        except OSError:
+        os.system("sudo hciconfig hci0 piscan")
+        self.server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        self.port = bluetooth.PORT_ANY
+        self.server_sock.bind(("", self.port))
+        self.server_sock.listen(1)
+        bluetooth.advertise_service(
+                sock = self.server_sock,
+                name = AndroidConfigs.BT_NAME,
+                service_id = AndroidConfigs.UUID,
+                service_classes = [AndroidConfigs.UUID, bluetooth.SERIAL_PORT_CLASS],
+                profiles = [bluetooth.SERIAL_PORT_PROFILE]
+                )
+        
+        self.client_sock = None
+        print("Android (INSTANTIATED)")
+
+    def isConnected(self):
+        if self.client_sock == None:
             return False
         return True
 
-    def isConnected(self):
-        return self.connected
-
     def connect(self):
-        if self.port_exists():
-            try: 
-                self.serial.open()
-                print(f"Arduino (CONNECTED) to {self.serial.port}")
-                self.connected = True
-                # break
-            except Exception as e:
-                print(e)
+        try:
+            os.system("sudo hciconfig hci0 piscan")
+            print(f"Android (WAITING) start advertising")
+            if self.client_sock == None:
+                print(f"Android (WAITING) on RFCOMM port {self.port}")
+                self.client_sock, self.client_address = self.server_sock.accept()
+                print(f"Android (CONNECTED) to {self.client_sock.getpeername} @ {self.client_address}")
+            os.system("sudo hciconfig hci0 noscan")
+            print(f"Android (CONNECTED) stop advertising")
+        except Exception as e:
+            print(f"Android (ERROR) connect():{e}")
 
-    def disconnect(self):
-        self.serial.close()
-        self.connected = False
-        print(f"Arduino (DISCONNECTED)")
+    def disconnect_client(self):
+        if self.client_sock != None:
+            self.client_sock.close()
+            self.client_sock = None
+            print("Android (CLIENT DISCONNECTED)")
+
+    def disconnect_server(self):
+        if self.server_sock != None:
+            self.server_sock.close()
+            print("Android (SERVER DISCONNECTED)")
 
     def read(self):
         try:
-            message = self.serial.readline().decode("utf-8").strip()
+            raw_message = self.client_sock.recv(AndroidConfigs.BUFFER_SIZE)
+            message = raw_message.decode("utf-8").strip().strip('\x00')
             if len(message) > 0 :
-                print(f"Arduino (MESSAGE-FROM):{message}")
-                return message
-        # except serial.SerialException:
-        #     self.disconnect()
+                print(f"Android (MESSAGE-FROM): {message}")
+                return message.decode("utf-8").strip()
+            message = None
         except Exception as e:
-            print(f"Arduino (ERROR) read():{e}")
-            self.disconnect()  # <<<<<<
+            self.disconnect_client()
+            print(f"Android (ERROR) read():{e}")
         return None
 
     def write(self, message):
         try:
-            print(f"Arduino (MESSAGE-TO): {message}")
-            self.serial.write(message.encode("utf-8"))
-        # except serial.SerialException:
-        #     print("serial.SerialException")
-        #     self.connect()
+            print(f"Algorithm (MESSAGE-TO): {message}")
+            # buffer = message +"\x00"*max(AlgorithmConfigs.BUFFER_SIZE-len(message ),0)
+            self.client_sock.send(message.encode('utf-8'))
         except Exception as e:
-            print(f"Arduino (ERROR) write():{e}")
-            self.disconnect() # <<<<<<
-            # self.connect()
+            print(f"Android (ERROR) write():{e}")
+    
+# if __name__ == "__main__":
+#     main = Android()
+#     main.connect()
+#     i = 0 
+#     while i<10:
+#         main.write(f"Write to bluetooth slave {i}\n")
+#         i += 1
+#     main.disconnect()
