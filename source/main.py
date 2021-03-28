@@ -1,7 +1,6 @@
 from multiprocessing import Process, Value, Queue, Manager
 from multiprocessing.managers import BaseManager
 
-from utils.commands import *
 from arduino import Arduino
 from algorithm import Algorithm
 from android import Android
@@ -9,6 +8,9 @@ from cvimage import ImageCV
 
 class Main:
     def __init__(self):
+        """ 
+        Start shared memory objects and multiprocessing 
+        """
         self.write_queue = Manager().Queue()
 
         BaseManager.register('Arduino',Arduino)
@@ -35,6 +37,9 @@ class Main:
         p5.join()
 
     def read_arduino(self, arduino):
+        """
+        Arduino read process, requires Arduino object
+        """
         while True:
             raw_message = None
             if arduino.isConnected() == False:
@@ -56,6 +61,9 @@ class Main:
                     break    
 
     def read_algorithm(self, algorithm, imagecv):
+        """
+        Algorithm read process, requires Algorithm object and CV object (for running native RPI OS specific functions)
+        """
         while True:
             raw_message = None
             if not algorithm.isConnected():
@@ -66,7 +74,7 @@ class Main:
                     if raw_message is None:
                         continue
                     else:
-                        message = raw_message.split(SEPERATOR)
+                        message = raw_message.split('|')
                         if message[0] == "CV" and message[1] != "Q": # <<<<<
                             coordinate = message[1]
                             file_name = imagecv.take_image(coordinate)
@@ -82,6 +90,9 @@ class Main:
                     break
 
     def read_android(self, android):
+        """
+        Android read process, requires Android object
+        """
         while True:
             raw_message = None
             if android.isConnected() == False:
@@ -101,6 +112,9 @@ class Main:
                     break
 
     def read_imagecv(self, imagecv):
+        """
+        CV read process, requires CV object
+        """
         i = 0
         while True:
             message = None
@@ -122,12 +136,15 @@ class Main:
                     break
 
     def write_target(self, arduino, algorithm, android, cv):
+        """
+        FIFO queue write process, requires all interfaces
+        """
         print("Write Process (CALLED)")
         while True:
             try:
                 if not self.write_queue.empty():
                     message = self.write_queue.get()
-                    i =  message.split(SEPERATOR)
+                    i =  message.split('|')
                     if i[0] == "ARD":
                         if arduino.isConnected() == True:
                             arduino.write(message)
